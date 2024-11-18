@@ -5,13 +5,21 @@ This project demonstrates a CI/CD pipeline for a simple CNN model trained on MNI
 ## Project Structure 
 .
 ├── model/
+
 │ └── train.py
+
 ├── tests/
+
 │ └── test_model.py
+
 ├── .github/
+
 │ └── workflows/
+
 │ └── ml-pipeline.yml
+
 ├── requirements.txt
+
 └── README.md
 
 ## Local Setup
