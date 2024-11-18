@@ -36,7 +36,7 @@ def train():
     
     # Set device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print(f"🖥️  Using device: {device}")
+    print(f"🖥️ Using device: {device}")
     
     # Data loading with augmentation
     train_dataset = datasets.MNIST(
@@ -65,7 +65,7 @@ def train():
     print("✅ Model initialization completed!")
     
     # Train for one epoch
-    print("\n🏃 Starting training...")
+    print("\n🏃pyte Starting training...")
     model.train()
     pbar = tqdm(train_loader, desc='Training batches')
     running_loss = 0.0

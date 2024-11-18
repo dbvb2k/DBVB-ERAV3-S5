@@ -6,19 +6,12 @@ This project demonstrates a CI/CD pipeline for a simple CNN model trained on MNI
 .
 ├── model/
 │ └── train.py
-
 ├── tests/
-
 │ └── test_model.py
-
 ├── .github/
-
 │ └── workflows/
-
 │ └── ml-pipeline.yml
-
 ├── requirements.txt
-
 └── README.md
 
 ## Local Setup
@@ -64,7 +57,7 @@ git init
 git add .
 git commit -m "Initial commit"
 git branch -M main
-git remote add origin <your-repo-url>
+git remote add origin https://github.com/dbvb2k/DBVB-ERAV3-S5.git
 git push -u origin main
 
 
