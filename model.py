@@ -31,9 +31,9 @@ class MNISTModel(nn.Module):
         # Final Convolution Blocks
         self.conv4 = nn.Conv2d(32, 10, kernel_size=1)  # 5x5 -> 5x5
         self.conv5 = nn.Conv2d(10, 10, kernel_size=5)  # 5x5 -> 1x1
-        self.bn4 = nn.BatchNorm2d(10)
-        self.relu4 = nn.ReLU()
         
+        # Global Average Pooling instead of final BatchNorm
+        self.gap = nn.AdaptiveAvgPool2d(1)  # Convert to 1x1
         self.flatten = nn.Flatten()
         self.softmax = nn.Softmax(dim=1)
 
@@ -65,8 +65,7 @@ class MNISTModel(nn.Module):
         # Final Convolutions
         x = self.conv4(x)
         x = self.conv5(x)
-        x = self.bn4(x)
-        x = self.relu4(x)
+        x = self.gap(x)  # Global Average Pooling
         
         # Output
         x = self.flatten(x)

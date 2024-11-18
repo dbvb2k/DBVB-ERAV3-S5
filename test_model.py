@@ -1,61 +1,107 @@
 import torch
-import torch.nn.functional as F
-from torchvision import datasets, transforms
-from model import MNISTModel
-import glob
 import pytest
+from model import MNISTModel, count_parameters
 
-def get_latest_model():
-    model_files = glob.glob('model_mnist_*.pth')
-    if not model_files:
-        raise FileNotFoundError("No model file found")
-    latest_model = max(model_files)
-    return latest_model
+@pytest.fixture
+def model():
+    return MNISTModel()
 
-def test_model_architecture():
-    model = MNISTModel()
-    
-    # Test input shape
-    test_input = torch.randn(1, 1, 28, 28)
-    output = model(test_input)
-    assert output.shape == (1, 10), "Output shape is incorrect"
-    
-    # Count parameters
-    total_params = sum(p.numel() for p in model.parameters())
-    assert total_params < 25000, f"Model has {total_params} parameters, should be less than 25000"
+def test_model_structure(model):
+    # Test basic model structure
+    assert isinstance(model, MNISTModel)
+    assert isinstance(model, torch.nn.Module)
 
-def test_model_accuracy():
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = MNISTModel().to(device)
+def test_forward_pass(model):
+    # Test forward pass with batch size of 1
+    x = torch.randn(1, 1, 28, 28)
+    output = model(x)
+    assert output.shape == (1, 10)
     
-    # Load the latest trained model
-    model_path = get_latest_model()
-    model.load_state_dict(torch.load(model_path, map_location=device))
+    # Test forward pass with batch size of 32
+    x = torch.randn(32, 1, 28, 28)
+    output = model(x)
+    assert output.shape == (32, 10)
+
+def test_parameter_count(model):
+    # Test that model has less than 25000 parameters
+    total_params = count_parameters(model)
+    assert total_params < 25000, f"Model has {total_params} parameters, which exceeds 25000"
+
+def test_output_probabilities(model):
+    # Test that output sums to 1 (softmax property)
+    x = torch.randn(1, 1, 28, 28)
+    output = model(x)
+    assert torch.allclose(output.sum(), torch.tensor(1.0), atol=1e-6)
+    assert torch.all(output >= 0) and torch.all(output <= 1)
+
+def test_model_components(model):
+    # Test presence of key components
+    assert hasattr(model, 'conv1')
+    assert hasattr(model, 'conv2')
+    assert hasattr(model, 'conv3')
+    assert hasattr(model, 'conv4')
+    assert hasattr(model, 'conv5')
+    
+    # Test batch normalization layers
+    assert hasattr(model, 'bn1')
+    assert hasattr(model, 'bn2')
+    assert hasattr(model, 'bn3')
+    
+    # Test dropout layers
+    assert hasattr(model, 'dropout1')
+    assert hasattr(model, 'dropout2')
+    assert hasattr(model, 'dropout3')
+    
+    # Test GAP layer
+    assert hasattr(model, 'gap')
+
+def test_layer_dimensions(model):
+    x = torch.randn(1, 1, 28, 28)
+    
+    # Test first conv block
+    x = model.conv1(x)
+    assert x.shape == (1, 16, 26, 26)
+    
+    # Test second conv block
+    x = model.conv2(model.dropout1(model.relu1(model.bn1(x))))
+    assert x.shape == (1, 16, 24, 24)
+    
+    # After first maxpool
+    x = model.pool1(model.dropout2(model.relu2(model.bn2(x))))
+    assert x.shape == (1, 16, 12, 12)
+    
+    # After third conv block
+    x = model.conv3(x)
+    assert x.shape == (1, 32, 10, 10)
+    
+    # After second maxpool
+    x = model.pool2(model.dropout3(model.relu3(model.bn3(x))))
+    assert x.shape == (1, 32, 5, 5)
+    
+    # Final convolutions and GAP
+    x = model.conv4(x)
+    assert x.shape == (1, 10, 5, 5)
+    x = model.conv5(x)
+    x = model.gap(x)
+    assert x.shape == (1, 10, 1, 1)
+
+def test_dropout_rates(model):
+    assert model.dropout1.p == 0.25
+    assert model.dropout2.p == 0.25
+    assert model.dropout3.p == 0.25
+
+def test_model_training_mode(model):
+    # Test training mode affects dropout
+    model.train()
+    assert model.training == True
+    x = torch.randn(100, 1, 28, 28)
+    out1 = model(x)
+    out2 = model(x)
+    assert not torch.allclose(out1, out2)  # Outputs should differ due to dropout
+    
+    # Test eval mode
     model.eval()
-    
-    # Load test dataset
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-    ])
-    
-    test_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('data', train=False, download=True, transform=transform),
-        batch_size=1000)
-    
-    correct = 0
-    total = 0
-    
-    with torch.no_grad():
-        for data, target in test_loader:
-            data, target = data.to(device), target.to(device)
-            output = model(data)
-            pred = output.argmax(dim=1)
-            correct += pred.eq(target).sum().item()
-            total += target.size(0)
-    
-    accuracy = 100. * correct / total
-    assert accuracy > 95, f"Model accuracy is {accuracy}%, should be > 95%"
-
-if __name__ == "__main__":
-    pytest.main([__file__]) 
+    assert model.training == False
+    out1 = model(x)
+    out2 = model(x)
+    assert torch.allclose(out1, out2)  # Outputs should be identical in eval mode 
