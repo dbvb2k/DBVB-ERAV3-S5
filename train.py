@@ -6,6 +6,7 @@ from model import MNISTModel
 from datetime import datetime
 import os
 from tqdm import tqdm
+from augmentation import train_transforms, test_transforms, show_augmented_samples
 
 def evaluate(model, device, test_loader):
     print("\n📊 Evaluating model...")
@@ -29,27 +30,30 @@ def count_parameters(model):
     return sum(p.numel() for p in model.parameters())
 
 def train():
-    print("\n🚀 Initializing training process...")
+    # First show the augmented samples
+    print("Displaying original and augmented 10 samples...")
+    show_augmented_samples()
     
     # Set device
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"🖥️  Using device: {device}")
     
-    # Load MNIST dataset
-    print("\n📥 Loading MNIST dataset...")
-    transform = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.1307,), (0.3081,))
-    ])
+    # Data loading with augmentation
+    train_dataset = datasets.MNIST(
+        './data', 
+        train=True, 
+        download=True,
+        transform=train_transforms
+    )
     
-    train_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('data', train=True, download=True, transform=transform),
-        batch_size=64, shuffle=True)
+    test_dataset = datasets.MNIST(
+        './data', 
+        train=False,
+        transform=test_transforms
+    )
     
-    test_loader = torch.utils.data.DataLoader(
-        datasets.MNIST('data', train=False, download=True, transform=transform),
-        batch_size=1000)
-    print("✅ Data loading completed!")
+    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
+    test_loader = torch.utils.data.DataLoader(test_dataset, batch_size=32, shuffle=False)
     
     # Initialize model
     print("\n🔧 Initializing model and optimizer...")

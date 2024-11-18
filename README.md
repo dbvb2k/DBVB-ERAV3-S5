@@ -5,7 +5,6 @@ This project demonstrates a CI/CD pipeline for a simple CNN model trained on MNI
 ## Project Structure 
 .
 ├── model/
-
 │ └── train.py
 
 ├── tests/
