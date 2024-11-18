@@ -157,7 +157,7 @@ def test_model_training_mode(model):
     assert torch.allclose(out1, out2)  # Outputs should be identical in eval mode 
 
 """ def test_model_gradient_flow():
-    """Test if gradients are flowing through the model properly"""
+    # Test if gradients are flowing through the model properly 
     model = MNISTModel()
     model.train()
     
