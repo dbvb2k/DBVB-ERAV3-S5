@@ -1,10 +1,65 @@
 import torch
 import pytest
 from model import MNISTModel, count_parameters
+from torchvision import datasets
+from torch.utils.data import DataLoader
+from augmentation import eval_transforms
+import torch.nn.functional as F
+import numpy as np
 
 @pytest.fixture
 def model():
     return MNISTModel()
+
+def test_parameter_count(model):
+    # Test that model has less than 25000 parameters
+    total_params = count_parameters(model)
+    assert total_params < 25000, f"Model has {total_params} parameters, which exceeds 25000"
+
+def test_model_accuracy():
+    # Set device
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    
+    # Load the test dataset
+    test_dataset = datasets.MNIST(
+        './data', 
+        train=False,
+        transform=eval_transforms,
+        download=True
+    )
+    test_loader = DataLoader(test_dataset, batch_size=1000, shuffle=False)
+    
+    # Load the model
+    model = MNISTModel().to(device)
+    
+    # Load the trained model weights
+    try:
+        model.load_state_dict(torch.load('models/mnist_model.pth', map_location=device))
+    except:
+        pytest.skip("Trained model weights not found. Skipping accuracy test.")
+    
+    # Set model to evaluation mode
+    model.eval()
+    
+    # Test the model
+    correct = 0
+    total = 0
+    
+    with torch.no_grad():
+        for data, target in test_loader:
+            data, target = data.to(device), target.to(device)
+            output = model(data)
+            
+            # Get predictions
+            _, predicted = torch.max(output.data, 1)
+            total += target.size(0)
+            correct += (predicted == target).sum().item()
+    
+    accuracy = 100 * correct / total
+    print(f"\nModel Accuracy on Test Set: {accuracy:.2f}%")
+    
+    # Assert accuracy is above 95%
+    assert accuracy > 95.0, f"Model accuracy ({accuracy:.2f}%) is below the required 95%"
 
 def test_model_structure(model):
     # Test basic model structure
@@ -21,11 +76,6 @@ def test_forward_pass(model):
     x = torch.randn(32, 1, 28, 28)
     output = model(x)
     assert output.shape == (32, 10)
-
-def test_parameter_count(model):
-    # Test that model has less than 25000 parameters
-    total_params = count_parameters(model)
-    assert total_params < 25000, f"Model has {total_params} parameters, which exceeds 25000"
 
 def test_output_probabilities(model):
     # Test that output sums to 1 (softmax property)
@@ -105,3 +155,129 @@ def test_model_training_mode(model):
     out1 = model(x)
     out2 = model(x)
     assert torch.allclose(out1, out2)  # Outputs should be identical in eval mode 
+
+def test_model_gradient_flow():
+    """Test if gradients are flowing through the model properly"""
+    model = MNISTModel()
+    model.train()
+    
+    # Create dummy input
+    x = torch.randn(1, 1, 28, 28)
+    
+    # Forward pass
+    output = model(x)
+    loss = output.sum()
+    
+    # Backward pass
+    loss.backward()
+    
+    # Check if gradients exist and are not zero
+    for name, param in model.named_parameters():
+        assert param.grad is not None, f"No gradient for {name}"
+        assert torch.any(param.grad != 0), f"Zero gradient for {name}"
+
+def test_model_input_dimensions():
+    """Test model behavior with different input dimensions"""
+    model = MNISTModel()
+    model.eval()
+    
+    # Test batch size variations
+    batch_sizes = [1, 32, 64, 128]
+    for batch_size in batch_sizes:
+        x = torch.randn(batch_size, 1, 28, 28)
+        output = model(x)
+        assert output.shape == (batch_size, 10), f"Failed for batch size {batch_size}"
+    
+    # Test invalid input dimensions
+    with pytest.raises(RuntimeError):
+        x = torch.randn(1, 2, 28, 28)  # Wrong number of channels
+        model(x)
+
+def test_model_save_load():
+    """Test model state saving and loading"""
+    model = MNISTModel()
+    
+    # Save model state
+    torch.save(model.state_dict(), 'temp_model.pth')
+    
+    # Create new model and load state
+    new_model = MNISTModel()
+    new_model.load_state_dict(torch.load('temp_model.pth'))
+    
+    # Compare model parameters
+    for p1, p2 in zip(model.parameters(), new_model.parameters()):
+        assert torch.equal(p1, p2)
+    
+    # Cleanup
+    import os
+    os.remove('temp_model.pth')
+
+def test_model_reproducibility():
+    """Test model output reproducibility"""
+    torch.manual_seed(42)
+    model = MNISTModel()
+    model.eval()
+    
+    x = torch.randn(1, 1, 28, 28)
+    output1 = model(x)
+    output2 = model(x)
+    
+    assert torch.allclose(output1, output2)
+
+def test_softmax_properties():
+    """Test if model output satisfies softmax properties"""
+    model = MNISTModel()
+    model.eval()
+    
+    x = torch.randn(10, 1, 28, 28)
+    output = model(x)
+    
+    # Sum should be close to 1
+    sums = output.sum(dim=1)
+    assert torch.allclose(sums, torch.ones_like(sums))
+    
+    # Values should be between 0 and 1
+    assert torch.all(output >= 0)
+    assert torch.all(output <= 1)
+
+def test_model_memory_efficiency():
+    """Test model memory usage"""
+    model = MNISTModel()
+    
+    # Get model size in MB
+    model_size = sum(p.numel() * p.element_size() for p in model.parameters()) / (1024 * 1024)
+    
+    # Model should be less than 1MB
+    assert model_size < 1, f"Model size ({model_size:.2f}MB) exceeds 1MB"
+
+def test_batch_norm_behavior():
+    """Test BatchNorm behavior in train vs eval modes"""
+    model = MNISTModel()
+    x = torch.randn(100, 1, 28, 28)
+    
+    # Training mode
+    model.train()
+    train_outputs = [model(x) for _ in range(2)]
+    assert not torch.allclose(train_outputs[0], train_outputs[1])
+    
+    # Eval mode
+    model.eval()
+    eval_outputs = [model(x) for _ in range(2)]
+    assert torch.allclose(eval_outputs[0], eval_outputs[1])
+
+def test_dropout_behavior():
+    """Test Dropout behavior in train vs eval modes"""
+    model = MNISTModel()
+    x = torch.randn(100, 1, 28, 28)
+    
+    # Training mode - outputs should be different
+    model.train()
+    out1 = model(x)
+    out2 = model(x)
+    assert not torch.allclose(out1, out2)
+    
+    # Eval mode - outputs should be identical
+    model.eval()
+    out1 = model(x)
+    out2 = model(x)
+    assert torch.allclose(out1, out2)

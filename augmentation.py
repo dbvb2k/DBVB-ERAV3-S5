@@ -13,7 +13,7 @@ train_transforms = transforms.Compose([
 ])
 
 # Original transform without augmentation
-test_transforms = transforms.Compose([
+eval_transforms = transforms.Compose([
     transforms.ToTensor(),
 ])
 
@@ -40,7 +40,7 @@ def print_augmentation_summary():
 
 def get_mnist_data():
     # Download MNIST dataset
-    train_data = datasets.MNIST('./data', train=True, download=True, transform=test_transforms)
+    train_data = datasets.MNIST('../data', train=True, download=True, transform=eval_transforms)
     return train_data
 
 def show_augmented_samples(num_samples=10):

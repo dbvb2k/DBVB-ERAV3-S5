@@ -17,7 +17,7 @@ env/
 data/
 
 # Model checkpoints (optional, remove if you want to track models)
-*.pth
+z*.pth
 
 # IDE
 .vscode/

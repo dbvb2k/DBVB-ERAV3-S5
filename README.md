@@ -1,8 +1,17 @@
-# ML Model CI/CD Pipeline
+# MNIST Classification Project
 
-This project demonstrates a CI/CD pipeline for a simple CNN model trained on MNIST dataset.
+![Build Status](https://github.com/{dbvb2k}/{https://github.com/dbvb2k/DBVB-ERAV3-S5.git}/actions/workflows/ml-pipeline.yml/badge.svg)
 
-## Project Structure 
+## Overview
+A PyTorch implementation of MNIST digit classification using a Convolutional Neural Network (CNN).
+
+## Features
+- Custom CNN architecture with <25,000 parameters
+- Data augmentation pipeline
+- Comprehensive test suite
+- Automated ML pipeline using GitHub Actions
+
+## Project Structure
 .
 ├── model/
 │ └── train.py
@@ -14,6 +23,12 @@ This project demonstrates a CI/CD pipeline for a simple CNN model trained on MNI
 ├── requirements.txt
 └── README.md
 
+## Requirements
+- Python 3.8+
+- PyTorch
+- torchvision
+- pytest
+- tqdm
 ## Local Setup
 
 1. Create a virtual environment:
@@ -41,13 +56,25 @@ The GitHub Actions pipeline will automatically:
    - Model accuracy (> 95%)
 5. Archive the trained model as an artifact
 
-## Model Details
-
+## Model Architecture Details
+- Input Layer: 1 channel (grayscale images)
+- Multiple convolutional layers with BatchNorm and Dropout
+- Global Average Pooling
+- Output: 10 classes (digits 0-9)
 - Architecture: Simple CNN with 2 convolutional layers and 2 fully connected layers
 - Dataset: MNIST
 - Training: 1 epoch
 - Input shape: 28x28 grayscale images
 - Output: 10 classes (digits 0-9)
+
+## Test Coverage
+- Model structure validation
+- Parameter count verification
+- Forward pass testing
+- Gradient flow checks
+- Input dimension validation
+- BatchNorm and Dropout behavior
+- Model accuracy verification (>95%)
 
 ## GitHub Setup
 

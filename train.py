@@ -6,7 +6,7 @@ from model import MNISTModel
 from datetime import datetime
 import os
 from tqdm import tqdm
-from augmentation import train_transforms, test_transforms, show_augmented_samples
+from augmentation import train_transforms, eval_transforms, show_augmented_samples
 
 def evaluate(model, device, test_loader):
     print("\n📊 Evaluating model...")
@@ -49,7 +49,7 @@ def train():
     test_dataset = datasets.MNIST(
         './data', 
         train=False,
-        transform=test_transforms
+        transform=eval_transforms
     )
     
     train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
