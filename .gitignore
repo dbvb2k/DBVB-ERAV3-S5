@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+.pytest_cache
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+dist/
+build/
+*.egg-info/
+
+# Virtual Environment
+venv/
+env/
+
+# Data
+data/
+
+# Model checkpoints (optional, remove if you want to track models)
+*.pth
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log 
