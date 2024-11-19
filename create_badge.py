@@ -1,5 +1,6 @@
 import anybadge
 import re
+import os
 
 def parse_pytest_output():
     try:
@@ -15,6 +16,11 @@ def parse_pytest_output():
             return 'unknown'
     except:
         return 'unknown'
+
+def remove_if_exists(file_path):
+    """Remove file if it exists"""
+    if os.path.exists(file_path):
+        os.remove(file_path)
 
 def create_test_badge():
     status = parse_pytest_output()
@@ -33,6 +39,9 @@ def create_test_badge():
         default_color=colors[status]
     )
     
+    # Remove existing badge if it exists
+    remove_if_exists('test_status.svg')
+    
     # Save the badge
     badge.write_badge('test_status.svg')
 
@@ -45,6 +54,9 @@ def create_build_badge():
             default_color='green'
         )
         
+        # Remove existing badge if it exists
+        remove_if_exists('build_status.svg')
+        
         # Save the badge
         badge.write_badge('build_status.svg')
     except Exception as e:
@@ -54,6 +66,7 @@ def create_build_badge():
             value='failed',
             default_color='red'
         )
+        remove_if_exists('build_status.svg')
         badge.write_badge('build_status.svg')
 
 if __name__ == '__main__':
