@@ -94,7 +94,7 @@ def train():
     # Save model with timestamp and accuracy
     print("\n💾 Saving model...")
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    save_path = f'model_mnist_{timestamp}_acc{accuracy:.1f}.pth'
+    save_path = f'models/model_mnist_{timestamp}_acc{accuracy:.1f}.pth'
     torch.save(model.state_dict(), save_path)
     print(f"✅ Model saved successfully as: {save_path}")
     print("\n🎉 All processes completed successfully!")

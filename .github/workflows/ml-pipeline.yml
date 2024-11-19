@@ -34,7 +34,7 @@ jobs:
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add test_status.svg build_status.svg
+        git add status-svg/*.svg
         git commit -m "Update status badges" || echo "No changes to commit"
         git push || echo "No changes to push"
       
@@ -42,7 +42,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: badges
-        path: '*.svg'
+        path: 'status-svg/*.svg'
         
     - name: Upload artifact
       uses: actions/upload-artifact@v4
