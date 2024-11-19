@@ -1,6 +1,7 @@
 # MNIST Classification Project
 
-![Build Status](https://github.com/{dbvb2k}/{https://github.com/dbvb2k/DBVB-ERAV3-S5.git}/actions/workflows/ml-pipeline.yml/badge.svg)
+![Build Status](https://github.com/dbvb2k/DBVB-ERAV3-S5/actions/workflows/ml-pipeline.yml/badge.svg)
+![Test Status](test_status.svg)
 
 ## Overview
 A PyTorch implementation of MNIST digit classification using a Convolutional Neural Network (CNN).

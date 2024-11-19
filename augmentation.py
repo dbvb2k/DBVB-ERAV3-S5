@@ -40,7 +40,7 @@ def print_augmentation_summary():
 
 def get_mnist_data():
     # Download MNIST dataset
-    train_data = datasets.MNIST('../data', train=True, download=True, transform=eval_transforms)
+    train_data = datasets.MNIST('./data', train=True, download=True, transform=eval_transforms)
     return train_data
 
 def show_augmented_samples(num_samples=10):
@@ -69,13 +69,13 @@ def show_augmented_samples(num_samples=10):
         # Plot original image
         ax = plt.subplot(2, num_samples, idx + 1)
         plt.imshow(image.squeeze(), cmap='gray')
-        plt.title(f'Original\nLabel: {label}')
+        plt.title(f'Original Image\nLabel: {label}')
         plt.axis('off')
         
         # Plot augmented image
         ax = plt.subplot(2, num_samples, idx + 1 + num_samples)
         plt.imshow(augmented_tensor.squeeze(), cmap='gray')
-        plt.title('Augmented')
+        plt.title('Augmented Image')
         plt.axis('off')
     
     plt.tight_layout()

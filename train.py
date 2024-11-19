@@ -65,7 +65,7 @@ def train():
     print("✅ Model initialization completed!")
     
     # Train for one epoch
-    print("\n🏃pyte Starting training...")
+    print("\n🏃 Starting training...")
     model.train()
     pbar = tqdm(train_loader, desc='Training batches')
     running_loss = 0.0
