@@ -1,6 +1,7 @@
 # MNIST Classification Project
 
-![Build Status](https://github.com/dbvb2k/DBVB-ERAV3-S5/actions/workflows/ml-pipeline.yml/badge.svg)
+![GitHub Actions Status](https://github.com/dbvb2k/DBVB-ERAV3-S5/actions/workflows/ml-pipeline.yml/badge.svg)
+![Build Status](build_status.svg)
 ![Test Status](test_status.svg)
 
 ## Overview

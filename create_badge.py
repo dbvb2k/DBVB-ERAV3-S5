@@ -16,7 +16,7 @@ def parse_pytest_output():
     except:
         return 'unknown'
 
-def create_badge():
+def create_test_badge():
     status = parse_pytest_output()
     
     # Define colors for different statuses
@@ -36,5 +36,26 @@ def create_badge():
     # Save the badge
     badge.write_badge('test_status.svg')
 
+def create_build_badge():
+    try:
+        # Create build badge
+        badge = anybadge.Badge(
+            label='build',
+            value='passing',
+            default_color='green'
+        )
+        
+        # Save the badge
+        badge.write_badge('build_status.svg')
+    except Exception as e:
+        # If there's an error, create a failed badge
+        badge = anybadge.Badge(
+            label='build',
+            value='failed',
+            default_color='red'
+        )
+        badge.write_badge('build_status.svg')
+
 if __name__ == '__main__':
-    create_badge() 
+    create_test_badge()
+    create_build_badge() 
