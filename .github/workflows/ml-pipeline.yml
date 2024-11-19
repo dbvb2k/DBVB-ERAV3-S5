@@ -56,4 +56,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: trained-model
-        path: model_mnist_*.pth
+        path: 'models/model_mnist_*.pth'
