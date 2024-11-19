@@ -13,6 +13,17 @@ A PyTorch implementation of MNIST digit classification using a Convolutional Neu
 - Comprehensive test suite
 - Automated ML pipeline using GitHub Actions
 
+## Model Architecture Details
+- Input Layer: 1 channel (grayscale images)
+- Multiple convolutional layers with BatchNorm and Dropout
+- Global Average Pooling
+- Output: 10 classes (digits 0-9)
+- Architecture: Simple CNN with 2 convolutional layers and 2 fully connected layers
+- Dataset: MNIST
+- Training: 1 epoch
+- Input shape: 28x28 grayscale images
+- Output: 10 classes (digits 0-9)
+
 ## Project Structure
 .
 ├── model/
@@ -31,6 +42,7 @@ A PyTorch implementation of MNIST digit classification using a Convolutional Neu
 - torchvision
 - pytest
 - tqdm
+
 ## Local Setup
 
 1. Create a virtual environment:
@@ -58,17 +70,6 @@ The GitHub Actions pipeline will automatically:
    - Model accuracy (> 95%)
 5. Archive the trained model as an artifact
 
-## Model Architecture Details
-- Input Layer: 1 channel (grayscale images)
-- Multiple convolutional layers with BatchNorm and Dropout
-- Global Average Pooling
-- Output: 10 classes (digits 0-9)
-- Architecture: Simple CNN with 2 convolutional layers and 2 fully connected layers
-- Dataset: MNIST
-- Training: 1 epoch
-- Input shape: 28x28 grayscale images
-- Output: 10 classes (digits 0-9)
-
 ## Test Coverage
 - Model structure validation
 - Parameter count verification
@@ -82,17 +83,16 @@ The GitHub Actions pipeline will automatically:
 
 1. Create a new repository on GitHub
 2. Initialize git in your local project:
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/dbvb2k/DBVB-ERAV3-S5.git
-git push -u origin main
-
-
+3. git init
+4. git add .
+5. git commit -m "Initial commit"
+6. git branch -M main
+7. git remote add origin https://github.com/dbvb2k/DBVB-ERAV3-S5.git
+8. git push -u origin main
+   
 The GitHub Actions pipeline will automatically run on every push to the repository.
 
-To use this project:
+**To use this project:**
 
 Create all the files in your local directory with the exact structure shown in the README.md
 Create a virtual environment and install dependencies
@@ -113,7 +113,8 @@ The tests specifically check:
 1. Model has less than 25000 parameters
 2. Model accepts 28x28 input
 3. Model outputs 10 classes
-4. Model achieves >95% accuracy
+4. Model achieves > 95% accuracy
+5. And others ...
 
 Each time you train the model, it will be saved with a timestamp suffix for tracking purposes.
 
